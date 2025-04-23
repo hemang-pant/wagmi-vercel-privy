@@ -18,6 +18,7 @@
     "test:e2e:ui": "playwright test --ui"
   },
   "dependencies": {
+    "@arcana/ca-wagmi": "^0.0.7-beta.8npm",
     "@privy-io/react-auth": "1.94.0",
     "@privy-io/wagmi": "0.2.12",
     "@tailwindcss/forms": "^0.5.7",

@@ -7,6 +7,7 @@ import {mainnet, sepolia} from 'viem/chains';
 import type {PrivyClientConfig} from '@privy-io/react-auth';
 import {PrivyProvider} from '@privy-io/react-auth';
 import {WagmiProvider, createConfig} from '@privy-io/wagmi';
+import { CAProvider } from '@arcana/ca-wagmi';
 
 const queryClient = new QueryClient();
 
@@ -41,7 +42,9 @@ export default function Providers({children}: {children: React.ReactNode}) {
     >
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={wagmiConfig} reconnectOnMount={false}>
+          <CAProvider>
           {children}
+          </CAProvider>
         </WagmiProvider>
       </QueryClientProvider>
     </PrivyProvider>
