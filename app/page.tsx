@@ -26,17 +26,38 @@ import WatchPendingTransactions from 'components/WatchPendingTransactions';
 import {shorten} from 'lib/utils';
 import Image from 'next/image';
 import {useAccount, useDisconnect} from 'wagmi';
+import { useBalanceModal } from '@arcana/ca-wagmi';
+import { useCAFn } from "@arcana/ca-wagmi"
 
 import {usePrivy, useWallets} from '@privy-io/react-auth';
 import {useSetActiveWallet} from '@privy-io/wagmi';
 
-import wagmiPrivyLogo from '../public/wagmi_privy_logo.png';
+import wagmiPrivyLogo from '../public/arcana_x_privy.png';
+import { useState } from 'react';
+import { Field, Label, Select, Input } from '@headlessui/react';
 
 const MonoLabel = ({label}: {label: string}) => {
   return <span className="rounded-xl bg-slate-200 px-2 py-1 font-mono">{label}</span>;
 };
 
 export default function Home() {
+
+  const { transfer, bridge } = useCAFn()
+  const [sendVal, setSendVal] = useState(
+    {
+      to: '',
+      amount: 0,
+      chain: 0,
+      token: '',
+      open: false,
+    }
+  );
+  const [bridgeVal, setBridgeVal] = useState({
+    amount: 0,
+    chain: 0,
+    token: '',
+    open: false,
+  });
   // Privy hooks
   const {ready, user, authenticated, login, connectWallet, logout, linkWallet} = usePrivy();
   const {wallets, ready: walletsReady} = useWallets();
@@ -50,6 +71,7 @@ export default function Home() {
     return null;
   }
 
+  const { showModal, hideModal } = useBalanceModal();
   return (
     <>
       <main className="min-h-screen bg-slate-200 p-4 text-slate-800">
@@ -62,6 +84,9 @@ export default function Home() {
         />
         <p className="my-4 text-center">
           This demo showcases how you can integrate{' '}
+          <a href="https://www.npmjs.com/package/@arcana/ca-wagmi" className="font-medium underline">
+            Arcana Network's CA-WAGMI SDK
+          </a>{' '} and  {' '}
           <a href="https://wagmi.sh/" className="font-medium underline">
             wagmi
           </a>{' '}
@@ -107,7 +132,7 @@ export default function Home() {
                     </div>
                     <Button
                       cta="Make active"
-                      onClick_={() => {
+                      onClick_={async () => {
                         setActiveWallet(wallet);
                       }}
                     />
@@ -118,25 +143,283 @@ export default function Home() {
             {ready && authenticated && (
               <>
                 <p className="mt-2">You are logged in with privy.</p>
-                <Button onClick_={connectWallet} cta="Connect another wallet" />
-                <Button onClick_={linkWallet} cta="Link another wallet" />
-                <textarea
-                  value={JSON.stringify(wallets, null, 2)}
-                  className="mt-2 w-full rounded-md bg-slate-700 p-4 font-mono text-xs text-slate-50 sm:text-sm"
-                  rows={JSON.stringify(wallets, null, 2).split('\n').length}
-                  disabled
-                />
-                <br />
-                <textarea
-                  value={JSON.stringify(user, null, 2)}
-                  className="mt-2 w-full rounded-md bg-slate-700 p-4 font-mono text-xs text-slate-50 sm:text-sm"
-                  rows={JSON.stringify(user, null, 2).split('\n').length}
-                  disabled
-                />
+                {/* <div
+                  className="flex min-w-full flex-row flex-wrap items-center justify-between gap-2 bg-slate-50 p-4"
+                > */}
+                <button 
+                // pink buttons
+                className="mt-2 rounded bg-pink-500 px-4 py-2 text-white"
+                onClick={() => {
+                  showModal()
+                }
+                }
+                >
+                  Show Unified Balance
+                </button>
+                <button 
+                // pink buttons
+                className="mt-2 rounded bg-pink-500 px-4 py-2 text-white"
+                onClick={() => {
+                  if(sendVal.open) {
+                    setSendVal({
+                      to: '',
+                      amount: 0,
+                      chain: 0,
+                      token: '',
+                      open: false,
+                    })
+                  } else {
+                    setBridgeVal({
+                      ...bridgeVal,
+                      open: false,
+                    })
+                    setSendVal({
+                      ...sendVal,
+                      open: true,
+                    })
+                  }
+                }
+                }
+                >
+                  Transfer
+                </button>
+                <button 
+                // pink buttons
+                className="mt-2 rounded bg-pink-500 px-4 py-2 text-white"
+                onClick={() => {
+
+                  if(bridgeVal.open) {
+                    setBridgeVal({
+                      token: '',
+                      amount: 0,
+                      chain: 0,
+                      open: false,
+                    })
+                  } else {
+                    setSendVal({
+                      to: '',
+                      amount: 0,
+                      chain: 0,
+                      token: '',
+                      open: false,
+                    })
+                    setBridgeVal({
+                      ...bridgeVal,
+                      open: true,
+                    })
+                  }
+                }
+                }
+                >
+                  Bridge     
+                </button>
+                {/* </div> */}
+                
+                <br/>
+                {
+                  sendVal.open && (
+                    <>
+                    <Field>
+                      <Label className="text-sm/6 font-medium text-black">
+                        To
+                      </Label>
+                      <Input
+                        type="text"
+                        className="mt-1 block w-half rounded-md bg-slate-700 text-white"
+                        placeholder="Enter Wallet Address"
+                        onChange={(e) => {
+                          setSendVal({
+                            ...sendVal,
+                            to: e.target.value,
+                          });
+                          console.log(e.target.value);
+                        }}
+                      />
+                    </Field>
+                    <Field>
+                      <Label className="text-sm/6 font-medium text-black">
+                        Amount
+                      </Label>
+                      <Input
+                        type="text"
+                        className="mt-1 block w-half rounded-md bg-slate-700 text-white"
+                        placeholder="Amount"
+                        onChange={(e) => {
+                          console.log(e.target.value);
+                          setSendVal({
+                            ...sendVal,
+                            amount: Number(e.target.value),
+                          });
+                        }}
+                      />
+                    </Field>
+
+                    <Field>
+                      <Label className="text-sm/6 font-medium text-black">
+                        Token
+                      </Label>
+                      <Input
+                        type="text"
+                        className="mt-1 block w-half rounded-md bg-slate-700 text-white"
+                        placeholder="USDC"
+                        onChange={(e) => {
+                          console.log(e.target.value);
+                          setSendVal({
+                            ...sendVal,
+                            token: e.target.value,
+                          });
+                        }}
+                      />
+                    </Field>
+                    <Field>
+                      <Label className="text-sm/6 font-medium text-black">
+                        Chain
+                      </Label>
+                      <div className="relative">
+                        <Select
+                          className="mt-1 block w-half rounded-md bg-slate-700 text-white"
+                          defaultValue="active"
+                          onChange={(e) => {
+                            console.log(e.target.value);
+                            setSendVal({
+                              ...sendVal,
+                              chain: Number(e.target.value),
+                            });
+                          }}
+                        >
+                          <option value="0">Select Chain</option>
+                          <option value="42161">Arbitrum One</option>
+                          <option value="10">OP Mainnet</option>
+                          <option value="8453">Base</option>
+                          <option value="534532">Scroll</option>
+                          <option value="137">Polygon POS</option>
+                          <option value="1">Ethereum Mainnet</option>
+                          <option value="59144">Linea</option>
+                        </Select>
+                      </div>
+                      <div className="mt-5">
+                        
+                          <button
+                            onClick={() => {
+                              transfer({
+                                to: `0x${sendVal.to
+                                  .slice(2)}`,
+                                amount: sendVal.amount.toString(),
+                                token: sendVal.token as any,
+                                chain: sendVal.chain,
+                              });
+                            }}
+                            className="text-sm bg-violet-200 hover:text-violet-900 py-2 px-4 rounded-md text-violet-700"
+                          >
+                            Send
+                          </button>
+                      </div>
+                    </Field>
+                  </>
+                )}
+                {
+                  bridgeVal.open && (
+                    <>
+                    <Field disabled>
+                      <Label className="text-sm/6 font-medium text-black">
+                        To
+                      </Label>
+                      <Input
+                        type="text"
+                        className="mt-1 block w-half rounded-md bg-slate-700 text-white"
+                        placeholder="SELF"
+                        onChange={(e) => {
+                          console.log(e.target.value);
+                        }}
+                      />
+                    </Field>
+                    <Field>
+                      <Label className="text-sm/6 font-medium text-black">
+                        Amount
+                      </Label>
+                      <Input
+                        type="text"
+                        className="mt-1 block w-half rounded-md bg-slate-700 text-white"
+                        placeholder="Amount"
+                        onChange={(e) => {
+                          console.log(e.target.value);
+                          setBridgeVal({
+                            ...bridgeVal,
+                            amount: Number(e.target.value),
+                          });
+                        }}
+                      />
+                    </Field>
+
+                    <Field>
+                      <Label className="text-sm/6 font-medium text-black">
+                        Token
+                      </Label>
+                      <Input
+                        type="text"
+                        className="mt-1 block w-half rounded-md bg-slate-700 text-white"
+                        placeholder="USDC"
+                        onChange={(e) => {
+                          console.log(e.target.value);
+                          setBridgeVal({
+                            ...bridgeVal,
+                            token: e.target.value,
+                          });
+                        }}
+                      />
+                    </Field>
+                    <Field>
+                      <Label className="text-sm/6 font-medium text-black">
+                        Chain
+                      </Label>
+                      <div className="relative">
+                        <Select
+                          className="mt-1 block w-half rounded-md bg-slate-700 text-white"
+                          defaultValue="active"
+                          onChange={(e) => {
+                            console.log(e.target.value);
+                            setBridgeVal({
+                              ...bridgeVal,
+                              chain: Number(e.target.value),
+                            });
+                          }}
+                        >
+                          <option value="0">Select Chain</option>
+                          <option value="42161">Arbitrum One</option>
+                          <option value="10">OP Mainnet</option>
+                          <option value="8453">Base</option>
+                          <option value="534532">Scroll</option>
+                          <option value="137">Polygon POS</option>
+                          <option value="1">Ethereum Mainnet</option>
+                          <option value="59144">Linea</option>
+                        </Select>
+                      </div>
+                      <div className="mt-5">
+                        
+                          <button
+                            onClick={() => {
+                              bridge({
+                                amount: bridgeVal.amount.toString(),
+                                token: bridgeVal.token as any,
+                                chain: bridgeVal.chain,
+                              });
+                            }}
+                            className="text-sm bg-violet-200 hover:text-violet-900 py-2 px-4 rounded-md text-violet-700"
+                          >
+                            Bridge
+                          </button>
+                        
+                      </div>
+                    </Field>
+                  </>
+                  )
+                }
                 <br />
                 <Button onClick_={logout} cta="Logout from Privy" />
               </>
-            )}
+                  )
+                }
+            
           </div>
           <div className="border-1 flex flex-col items-start gap-2 rounded border border-black bg-slate-100 p-3">
             <h1 className="text-4xl font-bold">WAGMI</h1>
@@ -151,31 +434,6 @@ export default function Home() {
                 <p>
                   address: <MonoLabel label={address} />
                 </p>
-
-                <Balance />
-                <Signer />
-                <SignMessage />
-                <SignTypedData />
-                <PublicClient />
-                <EnsName />
-                <EnsAddress />
-                <EnsAvatar />
-                <EnsResolver />
-                <SwitchNetwork />
-                <BlockNumber />
-                <SendTransaction />
-                <ContractRead />
-                <ContractReads />
-                <ContractWrite />
-                <ContractEvent />
-                <FeeData />
-                <Token />
-                <Transaction />
-                <WatchPendingTransactions />
-                <WalletClient />
-                <WaitForTransaction />
-
-                <h2 className="mt-6 text-2xl">useDisconnect</h2>
                 <Button onClick_={disconnect} cta="Disconnect from WAGMI" />
               </>
             )}
