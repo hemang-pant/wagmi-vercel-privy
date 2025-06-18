@@ -8,8 +8,10 @@ import type {PrivyClientConfig} from '@privy-io/react-auth';
 import {PrivyProvider} from '@privy-io/react-auth';
 import {WagmiProvider, createConfig} from '@privy-io/wagmi';
 import { CAProvider } from '@arcana/ca-wagmi';
+import { CA } from '@arcana/ca-sdk';
 
 const queryClient = new QueryClient();
+const ca = new CA();
 
 export const wagmiConfig = createConfig({
   chains: [mainnet, sepolia],
@@ -42,7 +44,7 @@ export default function Providers({children}: {children: React.ReactNode}) {
     >
       <QueryClientProvider client={queryClient}>
         <WagmiProvider config={wagmiConfig} reconnectOnMount={false}>
-          <CAProvider>
+          <CAProvider client={ca}>
           {children}
           </CAProvider>
         </WagmiProvider>
