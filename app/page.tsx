@@ -86,9 +86,9 @@ export default function Home() {
           This demo showcases how you can integrate{' '}
           <a href="https://www.npmjs.com/package/@arcana/ca-wagmi" className="font-medium underline">
             Arcana Network's CA-WAGMI SDK
-          </a>{' '} and  {' '}
+          </a>{' '} &  {' '}
           <a href="https://wagmi.sh/" className="font-medium underline">
-            wagmi
+            WAGMI
           </a>{' '}
           alongside{' '}
           <a href="https://www.privy.io/" className="font-medium underline">
@@ -108,12 +108,12 @@ export default function Home() {
         </p>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="border-1 flex flex-col items-start gap-2 rounded border border-black bg-slate-100 p-3">
-            <h1 className="text-4xl font-bold">Privy</h1>
+            {/* <h1 className="text-4xl font-bold">Privy</h1> */}
             {ready && !authenticated && (
               <>
-                <p>You are not authenticated with Privy</p>
+                <p>You are not authenticated</p>
                 <div className="flex items-center gap-4">
-                  <Button onClick_={login} cta="Login with Privy" />
+                  <Button onClick_={login} cta="Login" />
                   <span>or</span>
                   <Button onClick_={connectWallet} cta="Connect only" />
                 </div>
@@ -415,7 +415,7 @@ export default function Home() {
                   )
                 }
                 <br />
-                <Button onClick_={logout} cta="Logout from Privy" />
+                <Button onClick_={logout} cta="Logout" />
               </>
                   )
                 }
