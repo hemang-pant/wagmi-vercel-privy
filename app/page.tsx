@@ -32,7 +32,7 @@ import { useCAFn } from "@arcana/ca-wagmi"
 import {usePrivy, useWallets} from '@privy-io/react-auth';
 import {useSetActiveWallet} from '@privy-io/wagmi';
 
-import wagmiPrivyLogo from '../public/arcana_x_privy-without-privy.png';
+import wagmiPrivyLogo from '../public/ArcanaLogo.png';
 import { useState } from 'react';
 import { Field, Label, Select, Input } from '@headlessui/react';
 
@@ -90,25 +90,21 @@ export default function Home() {
           <a href="https://wagmi.sh/" className="font-medium underline">
             WAGMI
           </a>{' '}
-          alongside{' '}
-          <a href="https://www.privy.io/" className="font-medium underline">
-            Privy
-          </a>{' '}
-          in your React app. Login below to try it out!
+          with embedded wallets in your React app. Login with Email below to try it out!
           <br />
           For more information, check out{' '}
-          <a href="https://docs.privy.io/guide/guides/wagmi" className="font-medium underline">
+          <a href="https://docs.arcana.network/" className="font-medium underline">
             our integration guide
           </a>{' '}
           or the{' '}
-          <a href="https://github.com/privy-io/wagmi-demo" className="font-medium underline">
+          <a href="https://github.com/hemang-pant/wagmi-vercel-privy" className="font-medium underline">
             source code
           </a>{' '}
           for this app.
         </p>
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           <div className="border-1 flex flex-col items-start gap-2 rounded border border-black bg-slate-100 p-3">
-            {/* <h1 className="text-4xl font-bold">Privy</h1> */}
+            <h1 className="text-4xl font-bold">Embedded Wallet</h1>
             {ready && !authenticated && (
               <>
                 <p>You are not authenticated</p>
@@ -142,7 +138,7 @@ export default function Home() {
 
             {ready && authenticated && (
               <>
-                <p className="mt-2">You are logged in with privy.</p>
+                <p className="mt-2">You are logged in.</p>
                 {/* <div
                   className="flex min-w-full flex-row flex-wrap items-center justify-between gap-2 bg-slate-50 p-4"
                 > */}
