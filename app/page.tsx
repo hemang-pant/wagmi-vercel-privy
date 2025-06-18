@@ -32,7 +32,7 @@ import { useCAFn } from "@arcana/ca-wagmi"
 import {usePrivy, useWallets} from '@privy-io/react-auth';
 import {useSetActiveWallet} from '@privy-io/wagmi';
 
-import wagmiPrivyLogo from '../public/arcana_x_privy.png';
+import wagmiPrivyLogo from '../public/arcana_x_privy-without-privy.png';
 import { useState } from 'react';
 import { Field, Label, Select, Input } from '@headlessui/react';
 
